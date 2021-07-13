@@ -2,7 +2,8 @@ import subprocess,json,time,urllib3,os
 from bs4 import BeautifulSoup
 subprocess.call('cls',shell=True)
 
-IMG_FOLDER = os.getcwd() + '/img/'
+IMG_FOLDER = os.getcwd() + '/img2/'
+TXT_File = 'url2.txt'
 def read_data():
     file = open('data-pem.txt')
     IMG_URL = 15
@@ -18,7 +19,7 @@ def read_data():
     print('===============================')
 def read_html(htm_file):
     file = open(htm_file,encoding='UTF-8')
-    img_url = open('url2.txt','w+')
+    img_url = open(TXT_File,'w+')
     html = BeautifulSoup(file.read())
     print(len(html.find_all('div',{'class':'serp-item_type_search'})))
     #print(html.find_all('div',{'class':'serp-item_type_search'})[0]['data-bem'])
@@ -32,7 +33,7 @@ def read_html(htm_file):
 def download(name):
     http = urllib3.PoolManager()
     num=0
-    with open('url.txt') as url_file:
+    with open(TXT_File) as url_file:
         for url in url_file.readlines():
             real_url = url.split('\n')[0]
             try:
@@ -57,6 +58,7 @@ def download(name):
 
 t0 = time.time()
 read_html('3.htm')
-#download('grey_parrot')
+download('green_cheeked_conure')
 print('Time used : %.2f' % (time.time()-t0))
-#single-thread : 1538.7 sec / 1345 pics
+#single-thread : 1538.7 sec / 1345 pics for grey parrot
+#single-thread : 1652.q sec / 1479 pics for green cheeked
