@@ -1,0 +1,5 @@
+*_files/
+img*/
+birb/
+.vscode/
+*.htm
