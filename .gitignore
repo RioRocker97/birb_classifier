@@ -1,6 +1,4 @@
-*_files/
-img*/
+first_gather/
 birb/
 .vscode/
-*.htm
-url*.txt
+yolov5/
