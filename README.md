@@ -8,10 +8,7 @@
 - To create an endpoint for detecting bird with one simple script
 
 # Developer's Note
-- Now working on writing web scraping scripts that could be used on CMD 
-- Exploring ideas and structures to make Bird_Classifier one complete platform on-the-go
-- GCP is very useful for deployment
-- I'm confident enough that Docker Container is not so hard to use
+[HERE](developer_note.md)
 
 # understanding my messy code
 - yolo_detect.py : Based on [MY OLD word](https://github.com/RioRocker97/my_yolov5) which it loosely based on [YOLOv5](https://github.com/ultralytics/yolov5/blob/master/detect.py). it not perfect but it get the detection process done.
