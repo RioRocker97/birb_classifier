@@ -1,10 +1,11 @@
-import subprocess,json,time,urllib3,os,shutil
+import subprocess,json,time,urllib3,os,shutil,argparse
 from bs4 import BeautifulSoup
 from multiprocessing import cpu_count,Pool
 
-IMG_FOLDER = os.getcwd() + '/TEST/'
+TEMP_FOLDER = os.getcwd() + '/temp/'
 TXT_File = os.getcwd() + '/first_gather/url2.txt'
 REAL_IMG_FOLDER = os.getcwd() + '/first_gather/after/'
+FOLDER = os.getcwd() + '/first_gather/'
 HTTP = urllib3.PoolManager()
 NAME = "TEST"
 NUM = 1
@@ -23,7 +24,7 @@ def read_data():
     print('===============================')
 def read_html(htm_file):
     file = open(htm_file,encoding='UTF-8')
-    img_url = open(TXT_File,'w+')
+    img_url = open(FOLDER+'temp.txt','w+')
     html = BeautifulSoup(file.read())
     print(len(html.find_all('div',{'class':'serp-item_type_search'})))
     #print(html.find_all('div',{'class':'serp-item_type_search'})[0]['data-bem'])
@@ -39,7 +40,7 @@ def download(real_url):
     img_name = temp[len(temp)-1][0:20] + '.jpg'
     try:
         req = HTTP.request('GET',real_url,preload_content=False,timeout=3.0)
-        img_file = open(IMG_FOLDER+img_name,'wb')
+        img_file = open(TEMP_FOLDER+img_name,'wb')
         img_file.write(req.data)
         print(img_name + ' OK')
         img_file.close()
@@ -49,7 +50,7 @@ def download(real_url):
             
 def muti_download():
     url_list = []
-    with open(TXT_File) as url_file:
+    with open(FOLDER+'temp.txt') as url_file:
         for url in url_file.readlines():
             url_list.append(url.split('\n')[0])
     print("URL count :",len(url_list))
@@ -60,9 +61,9 @@ def muti_download():
 def muti_change(name):
     global NUM
     #file_list = []
-    for img in os.listdir(IMG_FOLDER):
+    for img in os.listdir(TEMP_FOLDER):
         #file_list.append(img)
-        shutil.copyfile(IMG_FOLDER+img,REAL_IMG_FOLDER+name+'_'+str(NUM)+'.jpg')
+        shutil.copyfile(TEMP_FOLDER+img,FOLDER+'/'+name+'/'+name+'_'+str(NUM)+'.jpg')
         print("NEW",name+'_'+str(NUM)+'.jpg',"OK")
         NUM+=1
     #print("File Count :",len(file_list))
@@ -74,19 +75,25 @@ def muti_change(name):
     change_pool.join()
     """
 #------------------------------------------------------------                
+def arg_parse():
+    inp = argparse.ArgumentParser()
+    inp.add_argument('--bird',type=str,default='after')
+    inp.add_argument('--htm',type=str,default='whatever.htm')
+    opt = inp.parse_args()
+    return opt
+def clear_folder(img_folder):
+    if os.path.exists(TEMP_FOLDER):
+        shutil.rmtree(TEMP_FOLDER)
+    if os.path.exists(FOLDER+img_folder):
+        shutil.rmtree(FOLDER+img_folder)
+    os.makedirs(TEMP_FOLDER)
+    os.makedirs(FOLDER+img_folder)
 if __name__ == '__main__':
     subprocess.call('cls',shell=True)
-    shutil.rmtree(IMG_FOLDER)
-    os.mkdir(IMG_FOLDER)
-    shutil.rmtree(REAL_IMG_FOLDER)
-    os.mkdir(REAL_IMG_FOLDER)
     t0 = time.time()
+    cmd_input = arg_parse()
+    clear_folder(cmd_input.bird)
+    read_html(cmd_input.htm)
     muti_download()
-    muti_change('TEST')
-    #read_html('3.htm')
-    #download('green_cheeked_conure')
+    muti_change(cmd_input.bird)
     print('Time used : %.2f' % (time.time()-t0))
-    #single-thread : 1538.7 sec / 1345 pics for grey parrot
-    #single-thread : 1652.q sec / 1479 pics for green cheeked
-    #Concurrent Pool : 154.26 sec / 1319 pics for green cheeked
-    #Concurrent Pool + Copy/change file name : 176.98 sec for 1314 for green cheeked

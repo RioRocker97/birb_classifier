@@ -3,3 +3,5 @@ birb/
 .vscode/
 yolov5/
 TEST/
+temp/
+*_log.txt
