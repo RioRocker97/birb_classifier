@@ -9,6 +9,19 @@ FOLDER = os.getcwd() + '/first_gather/'
 HTTP = urllib3.PoolManager()
 NAME = "TEST"
 NUM = 1
+
+"""
+    Extract image data from Yandex.com's image search Full HTM file
+    typically, yandex.com search result will always have starting image result at 30 pics
+    To extract more than that , you need to scroll down to the end of that search result page 
+    SO you could get like 1000+ pics
+    #### HOW to use ########
+    there are 4 flags
+    --bird for naming bird folder and file accordingly
+    --htm for using THAT HTM file to extract image URL
+    --change-only for only time you just want to change file accordingly
+    --add-num for that time when you want specific starting number of file for bird images
+"""
 def read_data():
     file = open('data-pem.txt')
     IMG_URL = 15
@@ -58,9 +71,10 @@ def muti_download():
     download_pool.map(download,url_list)
     download_pool.close()
     download_pool.join()
-def muti_change(name):
+def muti_change(name,add_num=0):
     global NUM
     #file_list = []
+    NUM+=add_num
     for img in os.listdir(TEMP_FOLDER):
         #file_list.append(img)
         shutil.copyfile(TEMP_FOLDER+img,FOLDER+'/'+name+'/'+name+'_'+str(NUM)+'.jpg')
@@ -79,6 +93,8 @@ def arg_parse():
     inp = argparse.ArgumentParser()
     inp.add_argument('--bird',type=str,default='after')
     inp.add_argument('--htm',type=str,default='whatever.htm')
+    inp.add_argument('--change-only',action='store_true')
+    inp.add_argument('--add-num',type=int,default=0)
     opt = inp.parse_args()
     return opt
 def clear_folder(img_folder):
@@ -88,12 +104,20 @@ def clear_folder(img_folder):
         shutil.rmtree(FOLDER+img_folder)
     os.makedirs(TEMP_FOLDER)
     os.makedirs(FOLDER+img_folder)
+def clear_temp():
+    if os.path.exists(TEMP_FOLDER):
+        shutil.rmtree(TEMP_FOLDER)
+    os.makedirs(TEMP_FOLDER)
 if __name__ == '__main__':
     subprocess.call('cls',shell=True)
     t0 = time.time()
     cmd_input = arg_parse()
-    clear_folder(cmd_input.bird)
-    read_html(cmd_input.htm)
-    muti_download()
-    muti_change(cmd_input.bird)
+    if cmd_input.change_only :
+        muti_change(cmd_input.bird,cmd_input.add_num)
+    else :
+        clear_folder(cmd_input.bird)
+        read_html(cmd_input.htm)
+        muti_download()
+        muti_change(cmd_input.bird)
+    clear_temp()
     print('Time used : %.2f' % (time.time()-t0))
