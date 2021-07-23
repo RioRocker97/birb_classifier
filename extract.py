@@ -57,7 +57,7 @@ def download(real_url):
         img_file.write(req.data)
         print(img_name + ' OK')
         img_file.close()
-        req.release_conn()
+        #req.release_conn()
     except :
         print(img_name + ' FAILED')
             
@@ -67,7 +67,8 @@ def muti_download():
         for url in url_file.readlines():
             url_list.append(url.split('\n')[0])
     print("URL count :",len(url_list))
-    download_pool = Pool(cpu_count())
+    # oh yeah , just add more workers . NoThInG cOuLd gO wRoNg.
+    download_pool = Pool(cpu_count()*2)
     download_pool.map(download,url_list)
     download_pool.close()
     download_pool.join()
@@ -97,7 +98,11 @@ def arg_parse():
     inp.add_argument('--add-num',type=int,default=0)
     opt = inp.parse_args()
     return opt
-def clear_folder(img_folder):
+def clear_folder(img_folder,htm_folder):
+    print(FOLDER+htm_folder.split('.htm')[0]+"_files")
+    time.sleep(3)
+    if os.path.exists(FOLDER+htm_folder.split('.htm')[0]+"_files"):
+        shutil.rmtree(FOLDER+htm_folder.split('.htm')[0]+"_files")
     if os.path.exists(TEMP_FOLDER):
         shutil.rmtree(TEMP_FOLDER)
     if os.path.exists(FOLDER+img_folder):
@@ -115,9 +120,9 @@ if __name__ == '__main__':
     if cmd_input.change_only :
         muti_change(cmd_input.bird,cmd_input.add_num)
     else :
-        clear_folder(cmd_input.bird)
+        clear_folder(cmd_input.bird,cmd_input.htm)
         read_html(cmd_input.htm)
         muti_download()
-        muti_change(cmd_input.bird)
+        muti_change(cmd_input.bird,cmd_input.add_num)
     clear_temp()
     print('Time used : %.2f' % (time.time()-t0))
