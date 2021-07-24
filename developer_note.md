@@ -8,3 +8,6 @@
 # Daily Progression
 - 19/7/2021 night
     - running first web scraping script . it's far from perfect but it get the job done . yandex is pretty good but i can find a better way to extract image data from somewhere else . Maybe google ? Bing ? , Image-Data API endpoint ?
+- 24/7/2021 
+    - first gathering is ok . it a little rough and maybe hard to re-use it later . Maybe, try re-writing web scraping script ?
+    - building bird_engine now. would be fun

@@ -60,15 +60,14 @@ def download(real_url):
         #req.release_conn()
     except :
         print(img_name + ' FAILED')
-            
-def muti_download():
+def muti_download(worker=cpu_count()):
     url_list = []
     with open(FOLDER+'temp.txt') as url_file:
         for url in url_file.readlines():
             url_list.append(url.split('\n')[0])
     print("URL count :",len(url_list))
     # oh yeah , just add more workers . NoThInG cOuLd gO wRoNg.
-    download_pool = Pool(cpu_count()*2)
+    download_pool = Pool(worker)
     download_pool.map(download,url_list)
     download_pool.close()
     download_pool.join()
@@ -113,6 +112,22 @@ def clear_temp():
     if os.path.exists(TEMP_FOLDER):
         shutil.rmtree(TEMP_FOLDER)
     os.makedirs(TEMP_FOLDER)
+#-----------------------------------------------------------
+def yandex_static_download(bird_name="wanker",htm_file="whatever.htm",only_change_file_name=False,starting_file_number=0,worker=cpu_count()):
+    #export extract.py into one simeple-to-use function
+    # will try to make it colorful in CMD usage later
+    t0=time.time()
+    print("============Download from yandex's static htm==============")
+    if only_change_file_name:
+        muti_change(bird_name,starting_file_number)
+    else:
+        clear_folder(bird_name,htm_file)
+        read_html(htm_file)
+        muti_download(worker)
+        muti_change(bird_name,starting_file_number)
+    clear_temp()
+    print('=====================Time used : %.2f======================' % (time.time()-t0))
+    print("============Download from yandex's static htm==============")
 if __name__ == '__main__':
     subprocess.call('cls',shell=True)
     t0 = time.time()
@@ -122,7 +137,7 @@ if __name__ == '__main__':
     else :
         clear_folder(cmd_input.bird,cmd_input.htm)
         read_html(cmd_input.htm)
-        muti_download()
+        muti_download(cpu_count()*2)
         muti_change(cmd_input.bird,cmd_input.add_num)
     clear_temp()
     print('Time used : %.2f' % (time.time()-t0))
