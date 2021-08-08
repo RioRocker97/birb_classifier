@@ -3,5 +3,8 @@ birb/
 .vscode/
 yolov5/
 TEST/
-temp/
 *_log.txt
+__pycache__/
+#ignore for now. will sort this folder thing later
+models/
+utils/

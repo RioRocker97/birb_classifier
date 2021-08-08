@@ -1,15 +1,13 @@
-import os,shutil,time,cv2,torch,threading,subprocess
+import time,torch
 
-from pathlib import Path
-import torch.backends.cudnn as cudnn
 from numpy import random
-from yolov5.models.experimental import attempt_load,Ensemble
-from yolov5.utils.datasets import LoadStreams,LoadImages
-from yolov5.utils.general import (
-    check_img_size, non_max_suppression, apply_classifier, scale_coords,
-    xyxy2xywh, strip_optimizer, set_logging)
-from yolov5.utils.plots import plot_one_box
-from yolov5.utils.torch_utils import select_device, load_classifier, time_synchronized
+from models.experimental import attempt_load,Ensemble
+from utils.datasets import LoadImages
+from utils.general import (
+    check_img_size, non_max_suppression,scale_coords,
+    xyxy2xywh)
+from utils.plots import plot_one_box
+from utils.torch_utils import select_device,time_synchronized
 
 
 ## Global Variable ###
@@ -21,14 +19,12 @@ device = 0
 half = False
 new_unk = False
 imgsz = 320
-onlyOne = False
 conf = 0
 #####################
-def prepareYolo(model_path,confidence=0.5,loadFromImage=False,imageSource=''):
+def prepareYolo(model_path,confidence=0.5):
     global dataset,model,colors,names,device,half,imgsz,onlyOne,conf
 
     weights = model_path
-    onlyOne = loadFromImage
     conf = confidence
     if(torch.cuda.device_count() == 0):
         print('Using CPU')
@@ -44,18 +40,21 @@ def prepareYolo(model_path,confidence=0.5,loadFromImage=False,imageSource=''):
     if half:
         model.half()  # to FP16
 
+    """
     cudnn.benchmark = True  # set True to speed up constant image size inference
     if onlyOne :
         dataset = LoadImages(imageSource, img_size=imgsz)
     else :
         dataset = LoadStreams('0', img_size=imgsz)
+    """
 
     # Get names and colors
     names = model.module.names if hasattr(model, 'module') else model.names
     colors = [[random.randint(0, 255) for _ in range(3)] for _ in range(len(names))]
-def runYolo():
+def runYolo(imageSource):
     global dataset,model,colors,names,device,half,new_unk,onlyOne,conf
-
+    
+    dataset = LoadImages(imageSource, img_size=imgsz)
     # Run inference
     t0 = time.time()
     img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
@@ -79,10 +78,13 @@ def runYolo():
     t2 = time_synchronized()
     # Process detections
     for i, det in enumerate(pred):  # detections per image
+        p, s, im0 = path[i], '%g: ' % i, im0s
+        """
         if onlyOne :
             p, s, im0 = path[i], '%g: ' % i, im0s
         else :
             p, s, im0 = path[i], '%g: ' % i, im0s[i].copy()
+        """
 
         s += '%gx%g ' % img.shape[2:]  # print string
         gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
@@ -106,13 +108,11 @@ def runYolo():
 
                 label = '%s %.2f' % (names[int(cls)], conf)
                 plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=3)
-                print()
-                if onlyOne :
-                    print("Found : %s at %.2f %.2f %.2f %.2f " % (names[int(cls)],line[1],line[2],line[3],line[4]))
+                print("\nFound : %s at %.2f %.2f %.2f %.2f " % (names[int(cls)],line[1],line[2],line[3],line[4]))
 
-        # Stream results
-        if not onlyOne :
-            cv2.destroyWindow('YOLO')
+        # Streaming results
+        #if not onlyOne :
+        #    cv2.destroyWindow('YOLO')
 
     print("Time To Detect : %.2f" % float(time.time() - t0))
     return im0
