@@ -3,11 +3,8 @@ from bs4 import BeautifulSoup
 from multiprocessing import cpu_count,Pool
 
 TEMP_FOLDER = os.getcwd() + '/temp/'
-TXT_File = os.getcwd() + '/first_gather/url2.txt'
-REAL_IMG_FOLDER = os.getcwd() + '/first_gather/after/'
-FOLDER = os.getcwd() + '/first_gather/'
+FOLDER = os.getcwd() + '/image_data/'
 HTTP = urllib3.PoolManager()
-NAME = "TEST"
 NUM = 1
 
 """

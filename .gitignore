@@ -1,4 +1,4 @@
-first_gather/
+image_data/
 birb/
 .vscode/
 yolov5/
@@ -8,3 +8,4 @@ __pycache__/
 #ignore for now. will sort this folder thing later
 models/
 utils/
+*.pt
