@@ -9,3 +9,6 @@ __pycache__/
 models/
 utils/
 *.pt
+
+#ignore try_new_thing for now
+try_new_thing.py
