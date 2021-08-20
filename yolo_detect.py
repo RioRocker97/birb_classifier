@@ -55,6 +55,7 @@ def runYolo(imageSource):
     global dataset,model,colors,names,device,half,new_unk,onlyOne,conf
     
     dataset = LoadImages(imageSource, img_size=imgsz)
+    res_cls = []
     # Run inference
     t0 = time.time()
     img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
@@ -102,6 +103,7 @@ def runYolo(imageSource):
 
             # Write results
             for *xyxy, conf, cls in reversed(det):
+                res_cls.append(names[int(cls)])
                 xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                 #line = (cls, conf, *xywh) if opt.save_conf else (cls, *xywh)  # label format . comment it out for lazy implement
                 line = (cls,*xywh)
@@ -115,6 +117,9 @@ def runYolo(imageSource):
         #    cv2.destroyWindow('YOLO')
 
     print("Time To Detect : %.2f" % float(time.time() - t0))
-    return im0
+    if len(res_cls) == 0:
+        return im0,"Nothing"
+    else:
+        return im0,res_cls[0]
 
 

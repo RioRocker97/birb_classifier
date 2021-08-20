@@ -4,6 +4,7 @@
 - GCP is very useful for deployment
 - I'm confident enough that Docker Container is not so hard to use
 - How to use Pool and Thread ??? Need to try them both for increasing performance
+- just realized that GCP's cloud run and cloud function can handle concurrency
 
 # Daily Progression
 - 19/7/2021 night
@@ -11,3 +12,7 @@
 - 24/7/2021 
     - first gathering is ok . it a little rough and maybe hard to re-use it later . Maybe, try re-writing web scraping script ?
     - building bird_engine now. would be fun
+- 20/8/2021
+    - re-construct core code for this project
+    - now it is plain ML application without other flexible and shit
+    - expected to do good detection and then show result via LINE uOA

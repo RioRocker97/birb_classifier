@@ -8,7 +8,8 @@ __pycache__/
 #ignore for now. will sort this folder thing later
 models/
 utils/
+temp/
 *.pt
 
 #ignore try_new_thing for now
-try_new_thing.py
+*_new_thing.py
