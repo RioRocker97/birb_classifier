@@ -1,13 +1,14 @@
-from os import getcwd,environ,path,makedirs
+from os import getcwd,environ,path,makedirs,remove
 from yolo_detect import prepareYolo,runYolo
 from subprocess import call
+from cv2 import imencode
 from google.cloud import storage
 
 BIRB_MODEL = getcwd()+'/birb_model/'
 TEMP = getcwd()+'/temp/'
 GCP_BUCKET = environ['GCP_B']
 GCP_BUCKET_URL = environ['GCP_B_URL']
-
+CONF = environ['CONF_VAL']
 def preload():
     """
     pre-load every YOLOv5's asset
@@ -15,14 +16,11 @@ def preload():
     """
     if not path.exists(BIRB_MODEL):
         makedirs(BIRB_MODEL)
-        # do download or update birb model
-        #my_progress("Get all model",100000)
     if not path.exists(BIRB_MODEL):
         makedirs(BIRB_MODEL)
-        #store image here before detection
     
     #cut to pre-load single model for now...
-    prepareYolo(BIRB_MODEL+'bird_first_gather.pt',confidence=0.7)
+    prepareYolo(BIRB_MODEL+'bird_first_gather.pt',confidence=CONF)
     #prepareYolo(BIRB_MODEL+'yolov5m.pt',confidence=0.7)
 def detect(img_id,img_data):
     """
@@ -34,18 +32,24 @@ def detect(img_id,img_data):
     # Do Detection
     try:
         img_result,label_result = runYolo(TEMP+str(img_id)+'.jpg')
-    except:
+    except Exception as e:
         print('ERROR Detecting')
+        print(e)
     # Do uploading result image after detection completed
     try:
         storage_client = storage.Client()
         bucket = storage_client.bucket(GCP_BUCKET)
         blob = bucket.blob(str(img_id)+'.jpg')
-        blob.upload_from_string(img_result,content_type='image/jpeg')
+        _,buffer = imencode('.jpg',img_result)
+
+        blob.upload_from_string(buffer.tobytes(),content_type='image/jpeg')
         print('Imaged Upload !')
         return GCP_BUCKET_URL+str(img_id)+'.jpg',label_result
-    except:
+    except Exception as e:
         print('ERROR uploading')
+        print(e)
+    finally:
+        remove(TEMP+str(img_id)+'.jpg')
 
 
 

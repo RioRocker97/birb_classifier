@@ -10,6 +10,9 @@ models/
 utils/
 temp/
 *.pt
-
+chang-gcp-*.json
 #ignore try_new_thing for now
 *_new_thing.py
+*.env
+*.dockerignore
+Dockerfile

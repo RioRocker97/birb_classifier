@@ -5,6 +5,10 @@
 - I'm confident enough that Docker Container is not so hard to use
 - How to use Pool and Thread ??? Need to try them both for increasing performance
 - just realized that GCP's cloud run and cloud function can handle concurrency
+- .gitignore > .dockerignore // remember this so i don't have to waste time debugging cloud build AGAIN!!!
+    - is this only happened in GCP's cloud run ?
+    - why my container can build just fine with .dockerignore included but cloud run can't ???? WTF /??
+- problem is fixed ! but this project need more polished (there's something i like to try before going LIVE)
 
 # Daily Progression
 - 19/7/2021 night
@@ -16,3 +20,7 @@
     - re-construct core code for this project
     - now it is plain ML application without other flexible and shit
     - expected to do good detection and then show result via LINE uOA
+- 21/8/2021
+    - change development style to test locally then go-live on-cloud when it ready
+    - still have no idea how gunicorn calling Webhook.py tho
+    - can this container at least handle 100 simultaneous API callings ?

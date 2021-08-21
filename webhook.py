@@ -79,6 +79,11 @@ def respond():
                 print("Text msg : ",payload['text'])
                 text_reply(token)
             if payload['type'] == 'image':
+                try:
+                    preload()
+                    print("Pre-load completed")
+                except:
+                    print("ERROR pre-loading YOLOv5")
                 user_id = address['userId']
                 img_id = payload['id']
                 text_reply(token,msg="Searching.... Please Wait")
@@ -86,10 +91,15 @@ def respond():
                 
 
     return Response(status=200)
-
+@app.route('/',methods=['GET'])
+def def_rep():
+    return Response(status=200)
 if __name__ == "__main__":
+    """
     try:
         preload()
+        print("Pre-load completed")
     except:
         print("ERROR pre-loading YOLOv5")
-    app.run(debug=True,host='0.0.0.0',port=80)
+    """
+    app.run(debug=True,host='0.0.0.0',port=int(environ['PORT']))
