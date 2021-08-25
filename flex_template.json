@@ -1,73 +1,74 @@
 {
-    "type": "bubble",
-    "body": {
-      "type": "box",
-      "layout": "vertical",
-      "contents": [
-        {
-          "type": "image",
-          "url": "https://images-cdn.9gag.com/photo/azmORAZ_700b.jpg",
-          "size": "full",
-          "aspectMode": "cover",
-          "aspectRatio": "6:8",
-          "gravity": "center",
-          "action": {
-            "type": "uri",
-            "label": "action",
-            "uri": "https://images-cdn.9gag.com/photo/azmORAZ_700b.jpg"
-          }
-        },
-        {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "look like...",
-              "position": "relative",
-              "offsetTop": "xs",
-              "offsetStart": "md",
-              "size": "sm",
-              "color": "#054B55"
-            },
-            {
-              "type": "text",
-              "text": "bird name",
-              "offsetTop": "xs",
-              "offsetStart": "lg",
-              "size": "3xl",
-              "color": "#E1F5FF"
-            }
-          ],
-          "position": "absolute",
-          "background": {
-            "type": "linearGradient",
-            "angle": "0deg",
-            "endColor": "#0680DC00",
-            "startColor": "#0680DCff",
-            "centerColor": "#0680DC70"
-          },
-          "width": "100%",
-          "height": "30%",
-          "offsetBottom": "0px",
-          "offsetStart": "0px",
-          "offsetEnd": "0px",
-          "paddingTop": "10%"
-        },
-        {
-          "type": "image",
-          "url": "https://image.flaticon.com/icons/png/512/3069/3069186.png",
-          "position": "absolute",
-          "size": "xs",
-          "offsetTop": "80%",
-          "offsetStart": "70%",
-          "action": {
-            "type": "uri",
-            "label": "action",
-            "uri": "https://en.wikipedia.org/wiki/Bird"
-          }
+  "type": "bubble",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "image",
+        "url": "https://photos.smugmug.com/Article-Photos/i-dTpnXPh/0/0e51468e/XL/talking-bird-XL.jpg",
+        "size": "full",
+        "aspectMode": "cover",
+        "aspectRatio": "6:8",
+        "gravity": "center",
+        "action": {
+          "type": "uri",
+          "label": "action",
+          "uri": "https://images-cdn.9gag.com/photo/azmORAZ_700b.jpg"
         }
-      ],
-      "paddingAll": "0px"
-    }
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "look like...",
+            "position": "relative",
+            "offsetTop": "30%",
+            "offsetStart": "lg",
+            "size": "sm",
+            "color": "#A2E9F7"
+          },
+          {
+            "type": "text",
+            "text": "bird name",
+            "offsetTop": "22%",
+            "offsetStart": "lg",
+            "size": "3xl",
+            "color": "#C9F3FC",
+            "position": "relative"
+          }
+        ],
+        "position": "absolute",
+        "background": {
+          "type": "linearGradient",
+          "angle": "0deg",
+          "endColor": "#0680DC00",
+          "startColor": "#0680DCff",
+          "centerColor": "#0680DCa0"
+        },
+        "width": "100%",
+        "height": "30%",
+        "offsetBottom": "0px",
+        "offsetStart": "0px",
+        "offsetEnd": "0px",
+        "paddingTop": "10%"
+      },
+      {
+        "type": "image",
+        "url": "https://image.flaticon.com/icons/png/512/3069/3069186.png",
+        "position": "absolute",
+        "size": "xs",
+        "offsetTop": "83%",
+        "offsetStart": "75%",
+        "action": {
+          "type": "uri",
+          "label": "action",
+          "uri": "https://en.wikipedia.org/wiki/Bird"
+        }
+      }
+    ],
+    "paddingAll": "0px"
   }
+}

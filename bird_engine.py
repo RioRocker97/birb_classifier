@@ -8,7 +8,7 @@ BIRB_MODEL = getcwd()+'/birb_model/'
 TEMP = getcwd()+'/temp/'
 GCP_BUCKET = environ['GCP_B']
 GCP_BUCKET_URL = environ['GCP_B_URL']
-CONF = environ['CONF_VAL']
+CONF = float(environ['CONF_VAL'])
 def preload():
     """
     pre-load every YOLOv5's asset
@@ -16,16 +16,15 @@ def preload():
     """
     if not path.exists(BIRB_MODEL):
         makedirs(BIRB_MODEL)
-    if not path.exists(BIRB_MODEL):
-        makedirs(BIRB_MODEL)
+    if not path.exists(TEMP):
+        makedirs(TEMP)
     
     #cut to pre-load single model for now...
     prepareYolo(BIRB_MODEL+'bird_first_gather.pt',confidence=CONF)
-    #prepareYolo(BIRB_MODEL+'yolov5m.pt',confidence=0.7)
 def detect(img_id,img_data):
     """
         Begin Deteciton here
-        This function should return detected image link url and most likely label
+        This function should return detected image link url and most-likely birb label
     """
     with open(TEMP+str(img_id)+'.jpg','wb') as temp_img:
         temp_img.write(img_data)
@@ -35,7 +34,7 @@ def detect(img_id,img_data):
     except Exception as e:
         print('ERROR Detecting')
         print(e)
-    # Do uploading result image after detection completed
+    # Do uploading result image after detection is completed
     try:
         storage_client = storage.Client()
         bucket = storage_client.bucket(GCP_BUCKET)

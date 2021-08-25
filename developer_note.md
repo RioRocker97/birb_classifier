@@ -9,7 +9,8 @@
     - is this only happened in GCP's cloud run ?
     - why my container can build just fine with .dockerignore included but cloud run can't ???? WTF /??
 - problem is fixed ! but this project need more polished (there's something i like to try before going LIVE)
-
+- just found a way to implement openAI's Completion API to make my own chatbot about bird
+    - the results are fking shocking. GPT-3 model is getting real human-alike
 # Daily Progression
 - 19/7/2021 night
     - running first web scraping script . it's far from perfect but it get the job done . yandex is pretty good but i can find a better way to extract image data from somewhere else . Maybe google ? Bing ? , Image-Data API endpoint ?
@@ -24,3 +25,6 @@
     - change development style to test locally then go-live on-cloud when it ready
     - still have no idea how gunicorn calling Webhook.py tho
     - can this container at least handle 100 simultaneous API callings ?
+- 25/8/2021
+    - modify Flex message template for better result and view
+    - found a way to implement openAI's completion API

@@ -7,6 +7,21 @@ COMMON_HEADER = {
     'Authorization': 'Bearer '+ environ['LINE_TOKEN'],
     'Content-Type': 'application/json'
 }
+OPENAI_API_KEY = environ['OPENAI_API']
+#--- OpenAI stuff
+def openai_setup():
+    # the idea about creating a conversation between man and openAI's completion API to make it look like a real chatbot
+    # should begin building from GCP's cloud storage to store chat text object
+    # then passing given text to openAI's completion api to get res
+    # then seperate it into a conversation piece then store it again in GCP's cloud storage
+    # should be fine as long as text objects won't be heaping much of the processing time or qurey time
+    # should try to experiement exchanging data rapiding to GCP's cloud storage first
+    pass
+def openai_chat():
+    this_header = COMMON_HEADER
+    this_header['Authorization'] = 'Bearer ' + OPENAI_API_KEY
+    # do stuff that get res from openai's completion api
+    pass
 #--- LINE stuff
 def construct_flex_msg(img_url,birb_icon_url,most_likely):
     """
