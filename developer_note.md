@@ -28,3 +28,5 @@
 - 25/8/2021
     - modify Flex message template for better result and view
     - found a way to implement openAI's completion API
+- 27/8/2021
+    - openAI's completion API seem kinda big to be implemented for such a specific task like creating a chatbot . there must be a way to do it right and efficiently

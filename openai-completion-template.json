@@ -4,7 +4,6 @@
     "temperature": 0.88,
     "top_p": 1,
     "n": 1,
-    "stop": "Human:",
-    "frequency_penalty" : 0.3,
-    "echo": true
+    "stop": ["Human:","\n"],
+    "frequency_penalty" : 0.3
 }

@@ -2,8 +2,7 @@ from os import getcwd,environ,path,makedirs,remove
 from yolo_detect import prepareYolo,runYolo
 from subprocess import call
 from cv2 import imencode
-from google.cloud import storage
-
+from google.cloud import storage,firestore
 BIRB_MODEL = getcwd()+'/birb_model/'
 TEMP = getcwd()+'/temp/'
 GCP_BUCKET = environ['GCP_B']
@@ -49,6 +48,4 @@ def detect(img_id,img_data):
         print(e)
     finally:
         remove(TEMP+str(img_id)+'.jpg')
-
-
 
