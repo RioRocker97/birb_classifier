@@ -1,7 +1,7 @@
 {
     "prompt": "This Helper is an friendly,fun AI that know everything about bird. Human: Hello,There. Helper ! Helper: Hello there,I heard you say it.",
-    "max_tokens": 1024,
-    "temperature": 0.88,
+    "max_tokens": 128,
+    "temperature": 0.7,
     "top_p": 1,
     "n": 1,
     "stop": ["Human:","\n"],
