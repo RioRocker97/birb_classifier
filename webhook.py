@@ -2,10 +2,9 @@ from time import time
 import urllib3,json
 from flask import Flask,Response,request
 from bird_engine import environ,preload,detect
-from google.cloud import firestore
+from line_user import *
 app = Flask(__name__)
 HTTP = urllib3.PoolManager()
-DB = firestore.Client()
 OPENAI_API_KEY = environ['OPENAI_API']
 COMMON_HEADER = {
     'Authorization': 'Bearer '+ environ['LINE_TOKEN'],
@@ -69,7 +68,52 @@ def text_reply(reply_token,msg="Default Message"):
     else :
         print(rep.data)
         print('Reply ERROR')
-def pust_text(user,msg):
+def muti_reply(reply_token,msg="Default Message"):
+    this_header = COMMON_HEADER
+    data = json.dumps({
+        "replyToken": reply_token,
+        "messages":[
+            {
+                "type":"text",
+                "text":msg,
+                "quickReply":{
+                    "items":[
+                        {
+                            "type":"action",
+                            "imageUrl":"https://image.flaticon.com/icons/png/512/1587/1587565.png",
+                            "action":
+                            {
+                                "type":"postback",
+                                "label":"helper-bot",
+                                "data":"activate-helper",
+                                "displayText":""
+                            }
+                        },
+                        {
+                            "type":"action",
+                            "imageUrl":"https://image.flaticon.com/icons/png/512/3069/3069186.png",
+                            "action":
+                            {
+                                "type":"postback",
+                                "label":"birb-detection",
+                                "data":"activate-birb",
+                                "displayText":""
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    })
+    rep = HTTP.request('POST','https://api.line.me/v2/bot/message/reply',
+        body = data,headers=this_header)
+    
+    if str(rep.status) == '200':
+        print('Reply OK')
+    else :
+        print(rep.data)
+        print('Reply ERROR')
+def push_text(user,msg):
     this_header = COMMON_HEADER
     this_header['Authorization'] = 'Bearer '+ environ['LINE_TOKEN']
     #print("DEBUG pushTEXT:",this_header)
@@ -77,7 +121,22 @@ def pust_text(user,msg):
         "to":user,
         "messages":[{
             "type": "text",
-            "text": msg 
+            "text": msg,
+                "quickReply":{
+                    "items":[
+                        {
+                            "type":"action",
+                            "imageUrl":"https://image.flaticon.com/icons/png/512/1587/1587565.png",
+                            "action":
+                            {
+                                "type":"postback",
+                                "label":"end helper-bot",
+                                "data":"deactivate-helper",
+                                "displayText":""
+                            }
+                        }
+                    ]
+                }
         }]
     })
     rep = HTTP.request('POST','https://api.line.me/v2/bot/message/push',headers=this_header,body=data)
@@ -95,25 +154,17 @@ def openai_setup(user_id):
     # then seperate it into a conversation piece then store it again in GCP's cloud storage
     # should be fine as long as text objects won't be heaping much of memory to be used during processing time or qurey time
     # should try to experiement exchanging data rapidly to GCP's cloud storage first
-    chat_history = DB.collection(str("line_user")).document(str(user_id))
-    if not chat_history.get().exists:
-        chat_history.set({
-            str("chat"): str("This Helper is a friendly,fun AI that know everything about bird.")
-        })
-def openai_chat(user_id,text="Human: Hello Helper!"):
+    set_user_chat(user_id)
+def openai_chat(user_id,text="Hello Helper!"):
     # do stuff that get res from openai's completion api
-    chat_history = DB.collection(str("line_user")).document(str(user_id))
-    all_chat = ""
-    if chat_history.get().exists:
-        all_chat = chat_history.get().to_dict().get("chat")
-        #print(all_chat)
-    
+    all_chat = get_user_chat(user_id)
+    all_chat += ' Human: '+text+ ' Helper: '
     this_header = COMMON_HEADER
     this_header['Authorization'] = 'Bearer ' + OPENAI_API_KEY
     #print("DEBUG openAI:",this_header)
     with open('openai-completion-template.json') as data_file:
         data = json.load(data_file)
-        data['prompt'] = all_chat+' Human: '+text
+        data['prompt'] = all_chat
         data = json.dumps(data)
     #print(type(data))
     rep = HTTP.request('POST','https://api.openai.com/v1/engines/davinci/completions',headers=this_header,body=data)
@@ -121,12 +172,10 @@ def openai_chat(user_id,text="Human: Hello Helper!"):
     if str(rep.status) == '200':
         # maybe i should divide these process into muti-thread
         rep_body = json.loads(rep.data.decode("UTF-8"))
-        all_chat+= ' ' + text + ' ' + rep_body['choices'][0]['text']
+        all_chat+= rep_body['choices'][0]['text']
         print("Text Generation completed! Saving to firesore...")
-        chat_history.set({
-            str("chat"): str(all_chat)
-        })
-        pust_text(user_id,rep_body['choices'][0]['text'])
+        set_user_chat(user_id,chat=all_chat)
+        push_text(user_id,rep_body['choices'][0]['text'])
     else:
         print("ERROR:",rep.data)
 
@@ -139,14 +188,18 @@ def respond():
             address = event['source']
             payload = event['message']
             user_id = address['userId']
-            text_reply(token,"NOW with chatbot. TRY NOW !!!")
-            openai_setup(user_id)
+            #text_reply(token,"NOW with chatbot. TRY NOW !!!")
+            #muti_reply(token,"Now with quick reply !!!")
+            #openai_setup(user_id)
             if payload['type'] == 'text':
                 print("from : ",user_id)
                 print("Text msg : ",payload['text'])
                 #text_reply(token,"NOW with chatbot. TRY NOW !!!")
-                openai_chat(user_id,payload['text'])
-            if payload['type'] == 'image':
+                if get_user_bot(user_id) :
+                    openai_chat(user_id,payload['text'])
+                else:
+                    muti_reply(token,"Select New Task")
+            elif payload['type'] == 'image':
                 try:
                     preload()
                     print("Pre-load completed")
@@ -155,7 +208,33 @@ def respond():
                 img_id = payload['id']
                 text_reply(token,msg="Searching.... Please Wait")
                 push_detection_res(user_id,img_id)
-                
+        elif event['type']=='postback':
+            token = event['replyToken']
+            user_id = event['source']['userId']
+            postback = event['postback']['data']
+            print("From:",user_id)
+            print("Postback-Request:",postback)
+            if postback == 'activate-helper':
+                set_user_bot(user_id,True)
+                set_user_detect(user_id,False)
+            elif postback == 'deactivate-helper':
+                set_user_bot(user_id,False)
+                set_user_chat(user_id)
+            elif postback == 'activate-birb':
+                set_user_bot(user_id,False)
+                set_user_detect(user_id,True)
+            text_reply(token,"Activate "+postback)      
+        elif event['type'] == 'follow':
+            user_id = event['source']['userId']
+            token = event['replyToken']
+            print("!!! NEW USER !!! {%s}" %user_id)
+            generate_initial_user_data(user_id)
+            muti_reply(token,"Select Task")
+        elif event['type'] == 'unfollow':
+            user_id = event['source']['userId']
+            print("!!! USER{%s} is leaving !!! " %user_id)
+            delete_user_data(user_id)
+
 
     return Response(status=200)
 @app.route('/',methods=['GET'])

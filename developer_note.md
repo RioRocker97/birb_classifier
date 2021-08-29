@@ -30,6 +30,9 @@
     - found a way to implement openAI's completion API
 - 27/8/2021
     - openAI's completion API seem kinda big to be implemented for such a specific task like creating a chatbot . there must be a way to do it right and efficiently
-- 26/6/2021
+- 28/8/2021
     - chatbot is kinda worked ! but it need to be polished more . some prompt that been feeding to openAI can be hard to interpret sometimes
     - maybe i should try experimenting this prompting techniques a little more
+- 29/8/2021
+    - sometimes the completion result can be bizzare word or something else entirely unrelated ! don't know why it acted like that tho
+    - overall structure is getting complexed . maybe i should try put them all in OOP style
