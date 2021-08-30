@@ -1,4 +1,4 @@
-from time import time
+#from time import time
 import urllib3,json
 from flask import Flask,Response,request
 from bird_engine import environ,preload,detect
@@ -31,24 +31,6 @@ def get_img(img_id):
         return rep.data
     else:
         raise Exception("ERROR at Get IMG")
-def push_detection_res(user,img_id):
-    this_header = COMMON_HEADER
-    img_link,img_label=detect(img_id,get_img(img_id))
-    data = json.dumps({
-        "to":user,
-        "messages":[{
-            "type":"flex",
-            "altText": "Reverse Image search in Flex style",
-            "contents": construct_flex_msg(img_link,"https://image.flaticon.com/icons/png/512/3069/3069186.png",img_label)     
-        }]
-    })
-    rep = HTTP.request('POST','https://api.line.me/v2/bot/message/push',headers=this_header,body=data)
-
-    if str(rep.status) == '200':
-        print('push reply {',user,'} OK')
-    else:
-        print(rep.data)
-        raise Exception('push reply ERROR')
 def text_reply(reply_token,msg="Default Message"):
     this_header = COMMON_HEADER
     data = json.dumps({
@@ -113,32 +95,45 @@ def muti_reply(reply_token,msg="Default Message"):
     else :
         print(rep.data)
         print('Reply ERROR')
-def push_text(user,msg):
+def push_text(user,msg,end_chat=False,end_detect=False):
     this_header = COMMON_HEADER
     this_header['Authorization'] = 'Bearer '+ environ['LINE_TOKEN']
-    #print("DEBUG pushTEXT:",this_header)
-    data = json.dumps({
+    # will try to move JSON object to JSON file for future improvment and easy-to-read code
+    raw_data = {
         "to":user,
         "messages":[{
             "type": "text",
             "text": msg,
-                "quickReply":{
-                    "items":[
-                        {
-                            "type":"action",
-                            "imageUrl":"https://image.flaticon.com/icons/png/512/1587/1587565.png",
-                            "action":
-                            {
-                                "type":"postback",
-                                "label":"end helper-bot",
-                                "data":"deactivate-helper",
-                                "displayText":""
-                            }
-                        }
-                    ]
-                }
+            "quickReply":{
+                "items":[]
+            }
         }]
-    })
+    }
+    if end_chat:
+        raw_data['messages'][0]['quickReply']['items'][0]={
+            "type":"action",
+            "imageUrl":"https://image.flaticon.com/icons/png/512/1587/1587565.png",
+            "action":
+            {
+                "type":"postback",
+                "label":"end helper-bot",
+                "data":"deactivate-helper",
+                "displayText":""
+            }
+        }
+    elif end_detect:
+        raw_data['messages'][0]['quickReply']['items'][0]={
+            "type":"action",
+            "imageUrl":"https://image.flaticon.com/icons/png/512/3069/3069186.png",
+            "action":
+            {
+                "type":"postback",
+                "label":"end birb-detection",
+                "data":"deactivate-detect",
+                "displayText":""
+            }
+        }
+    data = json.dumps(raw_data)
     rep = HTTP.request('POST','https://api.line.me/v2/bot/message/push',headers=this_header,body=data)
 
     if str(rep.status) == '200':
@@ -146,6 +141,25 @@ def push_text(user,msg):
     else:
         print("ERROR at PUST TEXT:",rep.data)
         raise Exception('push text ERROR')
+def push_detection_res(user,img_id):
+    this_header = COMMON_HEADER
+    img_link,img_label=detect(img_id,get_img(img_id))
+    data = json.dumps({
+        "to":user,
+        "messages":[{
+            "type":"flex",
+            "altText": "Reverse Image search in Flex style",
+            "contents": construct_flex_msg(img_link,"https://image.flaticon.com/icons/png/512/3069/3069186.png",img_label)     
+        }]
+    })
+    rep = HTTP.request('POST','https://api.line.me/v2/bot/message/push',headers=this_header,body=data)
+
+    if str(rep.status) == '200':
+        print('push reply {',user,'} OK')
+        push_text(user,"End birb-detection ?",end_detect=True)
+    else:
+        print(rep.data)
+        raise Exception('push reply ERROR')
 #--- OpenAI stuff
 def openai_setup(user_id):
     # the idea about creating a conversation between man and openAI's completion API to make it look like a real chatbot
@@ -173,41 +187,39 @@ def openai_chat(user_id,text="Hello Helper!"):
         # maybe i should divide these process into muti-thread
         rep_body = json.loads(rep.data.decode("UTF-8"))
         all_chat+= rep_body['choices'][0]['text']
-        print("Text Generation completed! Saving to firesore...")
+        #print("Text Generation completed! Saving to firesore...")
         set_user_chat(user_id,chat=all_chat)
-        push_text(user_id,rep_body['choices'][0]['text'])
+        push_text(user_id,rep_body['choices'][0]['text'],end_chat=True)
     else:
         print("ERROR:",rep.data)
-
+#---- webhook routing
 @app.route('/', methods=['POST'])
 def respond():
     line_events = request.json['events']
     for event in line_events:
         if event['type']=='message':
             token = event['replyToken']
-            address = event['source']
             payload = event['message']
-            user_id = address['userId']
-            #text_reply(token,"NOW with chatbot. TRY NOW !!!")
-            #muti_reply(token,"Now with quick reply !!!")
-            #openai_setup(user_id)
+            user_id = event['source']['userId']
             if payload['type'] == 'text':
                 print("from : ",user_id)
                 print("Text msg : ",payload['text'])
-                #text_reply(token,"NOW with chatbot. TRY NOW !!!")
                 if get_user_bot(user_id) :
                     openai_chat(user_id,payload['text'])
                 else:
                     muti_reply(token,"Select New Task")
             elif payload['type'] == 'image':
-                try:
-                    preload()
-                    print("Pre-load completed")
-                except:
-                    print("ERROR pre-loading YOLOv5")
-                img_id = payload['id']
-                text_reply(token,msg="Searching.... Please Wait")
-                push_detection_res(user_id,img_id)
+                if get_user_detect(user_id):   
+                    try:
+                        preload()
+                        print("Pre-load completed")
+                    except:
+                        print("ERROR pre-loading YOLOv5")
+                    img_id = payload['id']
+                    text_reply(token,msg="Searching.... Please Wait")
+                    push_detection_res(user_id,img_id)
+                else:
+                    muti_reply(token,"Select New Task")
         elif event['type']=='postback':
             token = event['replyToken']
             user_id = event['source']['userId']
@@ -217,13 +229,18 @@ def respond():
             if postback == 'activate-helper':
                 set_user_bot(user_id,True)
                 set_user_detect(user_id,False)
+                text_reply(token,"Helper is up ! begin to chat now !!!")
             elif postback == 'deactivate-helper':
                 set_user_bot(user_id,False)
                 set_user_chat(user_id)
+                text_reply(token,"Helper is gone ! see you later !!!")
             elif postback == 'activate-birb':
                 set_user_bot(user_id,False)
                 set_user_detect(user_id,True)
-            text_reply(token,"Activate "+postback)      
+                text_reply(token,"Birb-Detection is up ! send pic to begin detection !!!")
+            elif postback == 'deactivate-detect':
+                set_user_detect(user_id,False)
+                text_reply(token,"Birb-Detection is gone !")      
         elif event['type'] == 'follow':
             user_id = event['source']['userId']
             token = event['replyToken']
@@ -234,7 +251,6 @@ def respond():
             user_id = event['source']['userId']
             print("!!! USER{%s} is leaving !!! " %user_id)
             delete_user_data(user_id)
-
 
     return Response(status=200)
 @app.route('/',methods=['GET'])

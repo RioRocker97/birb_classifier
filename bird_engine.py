@@ -1,8 +1,8 @@
 from os import getcwd,environ,path,makedirs,remove
 from yolo_detect import prepareYolo,runYolo
-from subprocess import call
+#from subprocess import call
 from cv2 import imencode
-from google.cloud import storage,firestore
+from google.cloud import storage
 BIRB_MODEL = getcwd()+'/birb_model/'
 TEMP = getcwd()+'/temp/'
 GCP_BUCKET = environ['GCP_B']
