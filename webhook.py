@@ -173,7 +173,7 @@ def openai_setup(user_id):
 def openai_chat(user_id,text="Hello Helper!"):
     # do stuff that get res from openai's completion api
     all_chat = get_user_chat(user_id)
-    all_chat += 'Human: '+text+ ' \\nHelper: '
+    all_chat += '\\n Human: '+text+ ' \\n Helper:'
     this_header = COMMON_HEADER
     this_header['Authorization'] = 'Bearer ' + OPENAI_API_KEY
     #print("DEBUG openAI:",this_header)
@@ -188,17 +188,16 @@ def openai_chat(user_id,text="Hello Helper!"):
         # maybe i should divide these process into muti-thread
         rep_body = json.loads(rep.data.decode("UTF-8"))
         all_chat+= rep_body['choices'][0]['text']
-        #print("Text Generation completed! Saving to firesore...")
         try:
             sub_task1 = Thread(target=set_user_chat,args=(user_id,all_chat))
             sub_task2 = Thread(target=push_text,args=(user_id,rep_body['choices'][0]['text'],True,False))
             sub_task1.start()
             sub_task2.start()
+            sub_task1.join()
+            sub_task2.join()
         except Exception as e:
             print("ERROR at muti-Thread openai_chat")
             print(e)
-        #set_user_chat(user_id,chat=all_chat)
-        #push_text(user_id,rep_body['choices'][0]['text'],end_chat=True)
     else:
         print("ERROR:",rep.data)
 #---- webhook routing
@@ -242,14 +241,14 @@ def respond():
             elif postback == 'deactivate-helper':
                 set_user_bot(user_id,False)
                 set_user_chat(user_id)
-                text_reply(token,"Helper is gone ! see you later !!!")
+                muti_reply(token,"Helper-Bot end. Select New Task")
             elif postback == 'activate-birb':
                 set_user_bot(user_id,False)
                 set_user_detect(user_id,True)
                 text_reply(token,"Birb-Detection is up ! send pic to begin detection !!!")
             elif postback == 'deactivate-detect':
                 set_user_detect(user_id,False)
-                text_reply(token,"Birb-Detection is gone !")      
+                muti_reply(token,"Birb-Detection end. Select New Task")      
         elif event['type'] == 'follow':
             user_id = event['source']['userId']
             token = event['replyToken']

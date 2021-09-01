@@ -6,7 +6,7 @@ DB = firestore.Client().collection('line_user')
 def generate_initial_user_data(user_id):
     try:
         DB.document(user_id).set({
-            str('chat'): str("Helper is a friendly,fun AI that know everything about bird.\\n"),
+            str('chat'): str("Helper is a friendly,fun AI that know everything about bird."),
             str("is_bot_active"): False,
             str("is_detection_active"): False
         })
@@ -81,7 +81,7 @@ def set_user_chat(user_id,chat="DEFAULT"):
         if data.get().exists:
             if chat == "DEFAULT":
                 new_data = data.get().to_dict()
-                new_data.update({str("chat"):str("Helper is a friendly,fun AI that know everything about bird.\\n")})
+                new_data.update({str("chat"):str("Helper is a friendly,fun AI that know everything about bird.")})
                 data.set(new_data)
             else:
                 new_data = data.get().to_dict()
