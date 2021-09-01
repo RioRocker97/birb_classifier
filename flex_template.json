@@ -24,20 +24,20 @@
           {
             "type": "text",
             "text": "look like...",
-            "position": "relative",
-            "offsetTop": "30%",
+            "position": "absolute",
             "offsetStart": "lg",
             "size": "sm",
-            "color": "#A2E9F7"
+            "color": "#A2E9F7",
+            "offsetTop": "45%"
           },
           {
             "type": "text",
             "text": "bird name",
-            "offsetTop": "22%",
             "offsetStart": "lg",
             "size": "3xl",
             "color": "#C9F3FC",
-            "position": "relative"
+            "position": "absolute",
+            "offsetTop": "55%"
           }
         ],
         "position": "absolute",
@@ -53,7 +53,7 @@
         "offsetBottom": "0px",
         "offsetStart": "0px",
         "offsetEnd": "0px",
-        "paddingTop": "10%"
+        "paddingTop": "none"
       },
       {
         "type": "image",

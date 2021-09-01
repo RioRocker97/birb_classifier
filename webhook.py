@@ -3,6 +3,7 @@ import urllib3,json
 from flask import Flask,Response,request
 from bird_engine import environ,preload,detect
 from line_user import *
+from threading import Thread
 app = Flask(__name__)
 HTTP = urllib3.PoolManager()
 OPENAI_API_KEY = environ['OPENAI_API']
@@ -105,7 +106,7 @@ def push_text(user,msg,end_chat=False,end_detect=False):
             "type": "text",
             "text": msg,
             "quickReply":{
-                "items":[]
+                "items":[{}]
             }
         }]
     }
@@ -172,7 +173,7 @@ def openai_setup(user_id):
 def openai_chat(user_id,text="Hello Helper!"):
     # do stuff that get res from openai's completion api
     all_chat = get_user_chat(user_id)
-    all_chat += ' Human: '+text+ ' Helper: '
+    all_chat += 'Human: '+text+ ' \\nHelper: '
     this_header = COMMON_HEADER
     this_header['Authorization'] = 'Bearer ' + OPENAI_API_KEY
     #print("DEBUG openAI:",this_header)
@@ -188,8 +189,16 @@ def openai_chat(user_id,text="Hello Helper!"):
         rep_body = json.loads(rep.data.decode("UTF-8"))
         all_chat+= rep_body['choices'][0]['text']
         #print("Text Generation completed! Saving to firesore...")
-        set_user_chat(user_id,chat=all_chat)
-        push_text(user_id,rep_body['choices'][0]['text'],end_chat=True)
+        try:
+            sub_task1 = Thread(target=set_user_chat,args=(user_id,all_chat))
+            sub_task2 = Thread(target=push_text,args=(user_id,rep_body['choices'][0]['text'],True,False))
+            sub_task1.start()
+            sub_task2.start()
+        except Exception as e:
+            print("ERROR at muti-Thread openai_chat")
+            print(e)
+        #set_user_chat(user_id,chat=all_chat)
+        #push_text(user_id,rep_body['choices'][0]['text'],end_chat=True)
     else:
         print("ERROR:",rep.data)
 #---- webhook routing

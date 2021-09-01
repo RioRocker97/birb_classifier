@@ -1,5 +1,5 @@
 {
-    "prompt": "default",
+    "prompt": "Helper is a friendly,fun AI that know everything about bird.\\nHuman: Hello there.\\nHelper: ",
     "max_tokens": 128,
     "temperature": 0.7,
     "top_p": 1,
