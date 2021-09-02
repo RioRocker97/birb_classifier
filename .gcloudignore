@@ -1,0 +1,17 @@
+############# FOLDER ###########
+image_data/
+birb/
+.vscode/
+yolov5/
+TEST/
+__pycache__/
+######## File###############
+.dockerignore
+.gitignore
+chang-gcp-sandbox-*.json
+########### WILDCARD file#############
+*_log.txt
+*_new_thing.py
+*.md
+*.ps1
+*_new_thing.py

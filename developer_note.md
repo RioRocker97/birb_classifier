@@ -36,3 +36,6 @@
 - 29/8/2021
     - sometimes the completion result can be bizzare word or something else entirely unrelated ! don't know why it acted like that tho
     - overall structure is getting complexed . maybe i should try put them all in OOP style
+- 2/9/2021
+    - sucessfully deployed webhook on-cloud . now it's in beta-stage !
+    - will do code clean-up later

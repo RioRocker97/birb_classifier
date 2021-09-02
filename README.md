@@ -1,6 +1,9 @@
 # Bird Classifier
 :triumph: :triumph:  :triumph: Ongoing..... :triumph: :triumph: :triumph:
 
+## Demo
+<img src="https://i.imgur.com/6hcxR43.jpg" width="25%">
+
 # Why?
 - This Project is part of adventure of me and my friend trying to explore ML , API 
 - To create a platform for detecting any kind of bird that is known to man
@@ -16,4 +19,9 @@
 - extract.py : lazy web scraping scripts that use full static HTML file from yandex.com to extract birb pictures :white_check_mark:
 - bird-engine.py : scripts for running fully-function Web-API for bird_classifier. :white_check_mark:
 - (proposed) openai-mychat.py : scripts for calling openAI's completion API to make my own chatbot about birb :hourglass_flowing_sand:
-- (proposed) line_user.py : handling every user data that come and goes through LineOA :hourglass_flowing_sand:
+- line_user.py : handling every user data that come and goes through LineOA :white_check_mark:
+
+## Result
+| Helper-ChatBot | Helper-Birb |
+| :--: | :--: |
+| <img src="https://i.imgur.com/5gg0RVE.png" width="40%"> | <img src="https://i.imgur.com/vxUDT62.png" width="40%"> |
